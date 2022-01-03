@@ -1,5 +1,6 @@
 package si.fri.rso.admin.api.v1;
 
+import com.kumuluz.ee.cors.annotations.CrossOrigin;
 import com.kumuluz.ee.discovery.annotations.RegisterService;
 
 import javax.ws.rs.ApplicationPath;

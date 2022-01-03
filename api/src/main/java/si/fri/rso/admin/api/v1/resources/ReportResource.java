@@ -1,6 +1,7 @@
 package si.fri.rso.admin.api.v1.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kumuluz.ee.cors.annotations.CrossOrigin;
 import com.kumuluz.ee.discovery.annotations.DiscoverService;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -24,6 +25,7 @@ import java.util.Optional;
 @Path("/reports")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@CrossOrigin(supportedMethods = "GET, POST, PUT, HEAD, DELETE, OPTIONS")
 public class ReportResource {
 
 
@@ -56,7 +58,6 @@ public class ReportResource {
 
     /** GET all reports **/
     @GET
-    @Path("/")
     @Produces("application/json")
     public Response get() {
         List<Report> reportList = reportBean.getAllReports();
@@ -67,7 +68,27 @@ public class ReportResource {
         return Response.status(Response.Status.OK).entity(reportList).build();
     }
 
-    /** GET reports by used ID **/
+    @POST
+    @Produces("application/json")
+    public Response createReport(Report r) {
+        System.out.println(r);
+        if (r.getUserId() == null || r.getKomentar() == null || r.getOcenaId() == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Missing fields in body.").build();
+        }
+        long unixTime = System.currentTimeMillis() / 1000L;
+        r.setTimestamp(unixTime);
+
+
+        Report report = reportBean.createReport(r);
+        if (report.getTimestamp() == 999999999999L) {
+            return Response.status(Response.Status.CONFLICT).entity("Report for this comment already exists.").build();
+        }
+
+        return Response.status(Response.Status.CREATED).entity(r).build();
+
+    }
+
+    /** GET reports by user ID **/
     @GET
     @Path("/users/{userId}")
     @Produces("application/json")
@@ -83,7 +104,7 @@ public class ReportResource {
 
     /** **/
     @DELETE
-    @Path("{id}")
+    @Path("/{id}")
     public Response deleteReport(@PathParam("id") Integer id) {
 
         boolean deleted = reportBean.deleteReport(id);
@@ -107,7 +128,7 @@ public class ReportResource {
             response = httpClient.execute(request);
             return EntityUtils.toString(response.getEntity());
         } catch (IOException e) {
-            System.out.println("nigga: " + e.getMessage());
+            System.out.println("err: " + e.getMessage());
             return  e.getMessage();
         }
     }

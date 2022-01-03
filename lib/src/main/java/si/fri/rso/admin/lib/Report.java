@@ -6,7 +6,7 @@ public class Report {
     private Integer ocenaId;
     private Integer userId;
     private String komentar;
-    private Double timestamp;
+    private Long timestamp;
 
     public Integer getId() {
         return id;
@@ -40,11 +40,11 @@ public class Report {
         this.komentar = komentar;
     }
 
-    public Double getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Double timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 }

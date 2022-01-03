@@ -29,7 +29,7 @@ public class ReportEntity {
         @Column(name = "id", nullable = false)
         private Integer id;
 
-        @Column(name = "ocenaId")
+        @Column(name = "ocenaId", unique=true)
         private Integer ocenaId;
 
         @Column(name = "userId")
@@ -39,7 +39,7 @@ public class ReportEntity {
         private String komentar;
 
         @Column(name = "timestamp")
-        private double timestamp;
+        private Long timestamp;
 
 
         // ============= Getters and Setters =============
@@ -77,11 +77,11 @@ public class ReportEntity {
                 this.komentar = komentar;
         }
 
-        public double getTimestamp() {
+        public Long getTimestamp() {
                 return timestamp;
         }
 
-        public void setTimestamp(double timestamp) {
+        public void setTimestamp(Long timestamp) {
                 this.timestamp = timestamp;
         }
 

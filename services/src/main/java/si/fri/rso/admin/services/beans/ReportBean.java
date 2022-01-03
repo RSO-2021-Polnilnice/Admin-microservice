@@ -59,7 +59,33 @@ public class ReportBean {
         }
         return ReportConverter.toDto(resultList.get(0));
     }
+    /** POST **/
+    public Report createReport(Report r) {
 
+        ReportEntity reportEntity = ReportConverter.toEntity(r);
+
+
+        if (reportEntity != null) {
+            try {
+                beginTx();
+                em.persist(reportEntity);
+                commitTx();
+                em.refresh(reportEntity);
+            }
+            catch (Exception e) {
+                reportEntity.setKomentar(e.getMessage());
+                rollbackTx();
+                Report rr = ReportConverter.toDto(reportEntity);
+                rr.setTimestamp(999999999999L);
+                return rr;
+            }
+        }
+        else {
+            return null;
+        }
+
+        return ReportConverter.toDto(reportEntity);
+    }
 
     /** DELETE **/
     public boolean deleteReport(Integer id) {
