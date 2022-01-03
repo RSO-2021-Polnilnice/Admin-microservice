@@ -8,6 +8,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import si.fri.rso.admin.lib.Ocena;
 import si.fri.rso.admin.lib.Report;
 import si.fri.rso.admin.services.beans.ReportBean;
@@ -40,6 +46,10 @@ public class ReportResource {
     CloseableHttpClient httpClient = HttpClients.createDefault();
     ObjectMapper mapper = new ObjectMapper();
 
+    @Operation(description = "Get charging stations microservice IP as per service discovery network..", summary = "Get charging stations microservice IP")
+    @APIResponses({
+            @APIResponse(responseCode = "200", description = "Charging stations microservice IP."),
+    })
     @GET
     @Path("/discover")
     @Produces("application/json")
@@ -56,6 +66,17 @@ public class ReportResource {
         return Response.status(Response.Status.OK).entity(polnilnice_host.get()).build();
     }
 
+    @Operation(description = "Get list of all reports.", summary = "List of all reports")
+    @APIResponses({
+        @APIResponse(responseCode = "404",
+                description = "No reports found."
+        ),
+        @APIResponse(responseCode = "200",
+                description = "List of all reports.",
+                content = @Content(
+                        schema = @Schema(implementation = Report.class))
+        )
+    })
     /** GET all reports **/
     @GET
     @Produces("application/json")
@@ -68,9 +89,25 @@ public class ReportResource {
         return Response.status(Response.Status.OK).entity(reportList).build();
     }
 
+    @Operation(description = "Create a new report.", summary = "Create report")
+    @APIResponses({
+        @APIResponse(responseCode = "400",
+                description = "Missing fields in body.."
+        ),
+        @APIResponse(responseCode = "403", description = "Report for this comment already exists."),
+        @APIResponse(responseCode = "201",
+                description = "Report created.",
+                content = @Content(
+                        schema = @Schema(implementation = Report.class))
+        )
+    })
     @POST
     @Produces("application/json")
-    public Response createReport(Report r) {
+    public Response createReport(
+            @RequestBody(
+            description = "DTO object with report data.",
+            required = true, content = @Content(
+            schema = @Schema(implementation = Report.class))) Report r) {
         System.out.println(r);
         if (r.getUserId() == null || r.getKomentar() == null || r.getOcenaId() == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing fields in body.").build();
@@ -89,6 +126,17 @@ public class ReportResource {
     }
 
     /** GET reports by user ID **/
+    @Operation(description = "Get list of reports for user with provided ID.", summary = "Get list of reports for user")
+    @APIResponses({
+        @APIResponse(responseCode = "404",
+                description = "Reports for this user not found"
+        ),
+        @APIResponse(responseCode = "200",
+                description = "List of reports for user with provided ID.",
+                content = @Content(
+                        schema = @Schema(implementation = Report.class))
+        )
+    })
     @GET
     @Path("/users/{userId}")
     @Produces("application/json")
@@ -101,7 +149,13 @@ public class ReportResource {
         return Response.status(Response.Status.OK).entity(reportList).build();
     }
 
-
+    @Operation(description = "Deletes the report with provided ID.", summary = "Delete report")
+    @APIResponses({
+            @APIResponse(responseCode = "404",
+                    description = "Report with provided ID not found"
+            ),
+            @APIResponse(responseCode = "200", description = "Report deleted")
+    })
     /** **/
     @DELETE
     @Path("/{id}")

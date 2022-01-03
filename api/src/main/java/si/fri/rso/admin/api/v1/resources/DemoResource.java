@@ -2,6 +2,12 @@ package si.fri.rso.admin.api.v1.resources;
 
 
 import com.kumuluz.ee.cors.annotations.CrossOrigin;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import si.fri.rso.admin.services.config.RestProperties;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -26,6 +32,13 @@ public class DemoResource {
     @Inject
     private RestProperties restProperties;
 
+
+    @Operation(description = "Break service so health check show down.", summary = "Break service")
+    @APIResponses({
+        @APIResponse(responseCode = "200",
+                description = "Service sucessfuly broken."
+        ),
+    })
     @POST
     @Path("break")
     public Response makeUnhealthy() {
